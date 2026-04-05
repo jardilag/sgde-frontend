@@ -1,0 +1,85 @@
+:root {
+  --sgde-background: #f4f7fb;
+  --sgde-foreground: #102033;
+  --sgde-surface: rgba(255, 255, 255, 0.88);
+  --sgde-surface-strong: #ffffff;
+  --sgde-border: rgba(16, 32, 51, 0.12);
+  --sgde-primary: #0f4c81;
+  --sgde-primary-strong: #0a3558;
+  --sgde-accent: #0a7f7c;
+  --sgde-warning: #b54708;
+  --sgde-muted: #5b6b7f;
+  --sgde-shadow: 0 28px 60px rgba(16, 32, 51, 0.08);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: var(--font-manrope), "Manrope", sans-serif;
+  color: var(--sgde-foreground);
+  background: transparent;
+}
+
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(15, 76, 129, 0.14), transparent 30%),
+    radial-gradient(circle at top right, rgba(10, 127, 124, 0.08), transparent 28%),
+    linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-ibm-plex-mono), "IBM Plex Mono", monospace;
+}
+
+.sgde-surface {
+  background: var(--sgde-surface);
+  border: 1px solid var(--sgde-border);
+  box-shadow: var(--sgde-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.sgde-page-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.sgde-page-hero {
+  display: grid;
+  gap: 12px;
+}
+
+.sgde-muted {
+  color: var(--sgde-muted);
+}
+
+.sgde-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(15, 76, 129, 0.08);
+  color: var(--sgde-primary-strong);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.sgde-row-vencido > td {
+  background: rgba(211, 47, 47, 0.08) !important;
+  border-top: 1px solid rgba(211, 47, 47, 0.28) !important;
+  border-bottom: 1px solid rgba(211, 47, 47, 0.28) !important;
+}
