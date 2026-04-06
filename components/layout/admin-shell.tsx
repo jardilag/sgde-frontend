@@ -17,7 +17,7 @@ import {
   SwapOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, Space, Spin, Tag, Typography, notification } from 'antd';
+import { Button, Layout, Menu, Space, Spin, Tag, Tooltip, Typography, notification } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 import { logout } from '@/services/auth.service';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -123,7 +123,7 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
   const selectedKey = getSelectedKey(pathname);
 
   return (
-    <Layout style={{ minHeight: '100vh', background: 'transparent' }}>
+    <Layout className="sgde-app-shell" style={{ minHeight: '100vh', background: 'transparent' }}>
       <Sider
         breakpoint="lg"
         collapsedWidth={76}
@@ -135,9 +135,10 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
           margin: 16,
           borderRadius: 24,
           overflow: 'hidden',
-          background: 'rgba(255, 255, 255, 0.92)',
-          boxShadow: '0 28px 60px rgba(16, 32, 51, 0.1)',
+          background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 254, 0.9))',
+          boxShadow: '0 28px 60px rgba(16, 32, 51, 0.12)',
           border: '1px solid rgba(16, 32, 51, 0.08)',
+          backdropFilter: 'blur(20px)',
         }}
       >
         <div style={{ padding: 24, display: 'grid', gap: 10 }}>
@@ -168,7 +169,12 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
           </Space>
           {collapsed ? null : <Tag color="blue">Demo administrativa</Tag>}
         </div>
-        <Menu selectedKeys={[selectedKey]} items={menuItems} mode="inline" style={{ borderInlineEnd: 0 }} />
+        <Menu
+          selectedKeys={[selectedKey]}
+          items={menuItems}
+          mode="inline"
+          style={{ borderInlineEnd: 0, background: 'transparent', paddingInline: 10 }}
+        />
       </Sider>
 
       <Layout style={{ background: 'transparent' }}>
@@ -178,21 +184,18 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
             padding: '0 24px',
             height: 84,
             borderRadius: 24,
-            background: 'rgba(255, 255, 255, 0.92)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 254, 0.92))',
             boxShadow: '0 28px 60px rgba(16, 32, 51, 0.08)',
             border: '1px solid rgba(16, 32, 51, 0.08)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 16,
+            backdropFilter: 'blur(20px)',
           }}
         >
           <Space align="center">
-            <Button
-              type="text"
-              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              onClick={() => setCollapsed((value) => !value)}
-            />
+            <Button type="text" icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />} onClick={() => setCollapsed((value) => !value)} />
             <div>
               <Typography.Text strong>SGDE</Typography.Text>
               <Typography.Text className="sgde-muted" style={{ display: 'block' }}>
@@ -208,13 +211,16 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
                 {user?.dependencia ?? initialUser.dependencia}
               </Typography.Text>
             </div>
-            <Button
-              icon={logoutMutation.isPending ? <Spin size="small" /> : <LogoutOutlined />}
-              onClick={() => logoutMutation.mutate()}
-              disabled={logoutMutation.isPending}
-            >
-              Cerrar sesión
-            </Button>
+            <Tooltip title="Cerrar sesión" placement="bottom">
+              <Button
+                type="text"
+                icon={logoutMutation.isPending ? <Spin size="small" /> : <LogoutOutlined />}
+                onClick={() => logoutMutation.mutate()}
+                disabled={logoutMutation.isPending}
+                aria-label="Cerrar sesión"
+                style={{ width: 40, height: 40, borderRadius: 12 }}
+              />
+            </Tooltip>
           </Space>
         </Header>
 

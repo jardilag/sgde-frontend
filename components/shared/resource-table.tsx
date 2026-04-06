@@ -21,6 +21,8 @@ type ResourceTableProps<T> = Readonly<{
   pagination: TablePaginationConfig;
   onTableChange: TableProps<T>['onChange'];
   rowClassName?: TableProps<T>['rowClassName'];
+  scrollX?: number | string;
+  tableSize?: 'small' | 'middle' | 'large';
 }>;
 
 export function ResourceTable<T>({
@@ -39,9 +41,11 @@ export function ResourceTable<T>({
   pagination,
   onTableChange,
   rowClassName,
+  scrollX = 960,
+  tableSize = 'middle',
 }: ResourceTableProps<T>) {
   return (
-    <Card className="sgde-surface" styles={{ body: { display: 'grid', gap: 16 } }}>
+    <Card className="sgde-card-elevated" styles={{ body: { display: 'grid', gap: 18 } }}>
       <Space orientation="vertical" size={8} style={{ width: '100%' }}>
         <span className="sgde-chip">{eyebrow}</span>
         <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }} wrap>
@@ -69,9 +73,17 @@ export function ResourceTable<T>({
         dataSource={dataSource}
         columns={columns}
         rowClassName={rowClassName}
-        pagination={pagination}
+        pagination={{
+          ...pagination,
+          responsive: true,
+          showLessItems: true,
+          position: ['bottomCenter'],
+          size: 'default',
+          pageSizeOptions: pagination.pageSizeOptions ?? ['5', '10', '20', '50'],
+        }}
         onChange={onTableChange}
-        scroll={{ x: 960 }}
+        size={tableSize}
+        scroll={{ x: scrollX }}
       />
     </Card>
   );

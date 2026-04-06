@@ -12,7 +12,7 @@ export function ExpedientesEstadoChart({ data }: Readonly<ExpedientesEstadoChart
   const hasData = data.length > 0;
 
   return (
-    <Card className="sgde-surface" title="Expedientes por estado">
+    <Card className="sgde-card-elevated sgde-card-hover" title="Expedientes por estado">
       {hasData ? (
         <Space orientation="vertical" size={12} style={{ width: '100%' }}>
           {data.map((item) => {

@@ -1,5 +1,17 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Cambios recientes
+
+Se documentan aquí los ajustes visuales y de experiencia de usuario aplicados al front:
+
+- Login renovado con diseño premium, jerarquía tipográfica más clara, botones con gradiente y animaciones suaves.
+- Corrección del error de render en `/login` agregando `Suspense` alrededor del módulo de login para compatibilidad con `useSearchParams`.
+- Tema global más consistente para todo el front con superficies translúcidas, sombras suaves, bordes redondeados y mejor contraste.
+- Shell administrativo refinado con header y sidebar más limpios, y botón de cerrar sesión en modo ícono con tooltip.
+- Tablas compartidas mejoradas para responsividad, paginación más compacta y scroll horizontal cuando falta espacio.
+- Módulo de radicados ajustado para conservar toda la información visible, manteniendo columnas completas y acciones compactas en pantallas pequeñas.
+- Componentes reutilizables del dashboard y tablas actualizados para alinearse con la nueva identidad visual.
+
 ## Getting Started
 
 First, run the development server:

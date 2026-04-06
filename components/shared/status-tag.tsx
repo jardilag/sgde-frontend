@@ -22,5 +22,11 @@ interface StatusTagProps {
 }
 
 export function StatusTag({ value }: StatusTagProps) {
-  return <Tag color={colorMap[value.toLowerCase()] ?? 'default'}>{value}</Tag>;
+  const color = colorMap[value.toLowerCase()] ?? 'default';
+
+  return (
+    <Tag color={color} style={{ fontWeight: 600, letterSpacing: '0.01em', paddingInline: 12, boxShadow: '0 6px 16px rgba(16, 32, 51, 0.08)' }}>
+      {value}
+    </Tag>
+  );
 }

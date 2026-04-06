@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Alert, Button, Drawer, Form, Input, Popconfirm, Select, Space, notification } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { Alert, Button, Drawer, Form, Grid, Input, Popconfirm, Select, Space, notification } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
@@ -29,12 +29,14 @@ const initialValues: RadicadoRequest = {
 };
 
 export function RadicadosModule() {
+  const screens = Grid.useBreakpoint();
   const table = useTableControls<Radicado>();
   const radicadosQuery = useRadicadosQuery({ q: table.query, page: table.page, pageSize: table.pageSize });
   const { createMutation, updateMutation, deleteMutation } = useRadicadoMutations();
   const [form] = Form.useForm<RadicadoRequest>();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Radicado | null>(null);
+  const compactActions = !screens.md;
 
   useEffect(() => {
     if (drawerOpen) {
@@ -89,39 +91,42 @@ export function RadicadosModule() {
     }
   };
 
-  const columns: ColumnsType<Radicado> = [
-    { title: 'Número', dataIndex: 'numeroRadicado', width: 160 },
-    { title: 'Asunto', dataIndex: 'asunto', width: 240 },
-    { title: 'Remitente', dataIndex: 'remitente', width: 200 },
-    { title: 'Dependencia destino', dataIndex: 'dependenciaDestino', width: 200 },
-    { title: 'Estado', dataIndex: 'estado', render: (value: string) => <StatusTag value={value} />, width: 140 },
-    { title: 'Canal', dataIndex: 'canalIngreso', width: 160 },
-    { title: 'Fecha', dataIndex: 'fechaRadicacion', render: (value: string) => formatDate(value), width: 140 },
-    {
-      title: 'Acciones',
-      key: 'actions',
-      fixed: 'right',
-      width: 160,
-      render: (_value, record) => (
-        <Space>
-          <Button icon={<EditOutlined />} onClick={() => openEditDrawer(record)}>
-            Editar
-          </Button>
-          <Popconfirm
-            title="Eliminar radicado"
-            description="Esta acción no se puede deshacer."
-            okText="Eliminar"
-            cancelText="Cancelar"
-            onConfirm={() => handleDelete(record)}
-          >
-            <Button danger icon={<DeleteOutlined />} loading={deleteMutation.isPending}>
-              Eliminar
+  const columns: ColumnsType<Radicado> = useMemo(
+    () => [
+      { title: 'Número', dataIndex: 'numeroRadicado', width: 160, ellipsis: true },
+      { title: 'Asunto', dataIndex: 'asunto', width: 260, ellipsis: true },
+      { title: 'Remitente', dataIndex: 'remitente', width: 220, ellipsis: true },
+      { title: 'Dependencia destino', dataIndex: 'dependenciaDestino', width: 220, ellipsis: true },
+      { title: 'Estado', dataIndex: 'estado', render: (value: string) => <StatusTag value={value} />, width: 140 },
+      { title: 'Canal', dataIndex: 'canalIngreso', width: 170, ellipsis: true },
+      { title: 'Fecha', dataIndex: 'fechaRadicacion', render: (value: string) => formatDate(value), width: 140 },
+      {
+        title: 'Acciones',
+        key: 'actions',
+        fixed: 'right',
+        width: compactActions ? 110 : 180,
+        render: (_value, record) => (
+          <Space size={8}>
+            <Button size={compactActions ? 'small' : 'middle'} icon={<EditOutlined />} onClick={() => openEditDrawer(record)}>
+              {compactActions ? null : 'Editar'}
             </Button>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
+            <Popconfirm
+              title="Eliminar radicado"
+              description="Esta acción no se puede deshacer."
+              okText="Eliminar"
+              cancelText="Cancelar"
+              onConfirm={() => handleDelete(record)}
+            >
+              <Button danger size={compactActions ? 'small' : 'middle'} icon={<DeleteOutlined />} loading={deleteMutation.isPending}>
+                {compactActions ? null : 'Eliminar'}
+              </Button>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ],
+    [compactActions, deleteMutation.isPending],
+  );
 
   return (
     <div className="sgde-page-grid">
@@ -155,9 +160,15 @@ export function RadicadosModule() {
           pageSize: radicadosQuery.data?.meta.pageSize,
           total: radicadosQuery.data?.meta.total,
           showSizeChanger: true,
-          showTotal: (total) => `${total} radicados`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} radicados`,
+          pageSizeOptions: ['5', '10', '20', '50'],
+          responsive: true,
+          showLessItems: true,
+          position: ['bottomCenter'],
         }}
         onTableChange={table.handleTableChange}
+        scrollX={1180}
+        tableSize="middle"
       />
 
       <Drawer open={drawerOpen} onClose={closeDrawer} title={editingItem ? 'Editar radicado' : 'Nuevo radicado'} width={720} destroyOnClose>

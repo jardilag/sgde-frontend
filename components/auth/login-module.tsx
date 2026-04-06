@@ -46,108 +46,234 @@ export function LoginModule() {
   };
 
   return (
-    <Row gutter={[24, 24]} align="middle" justify="center" style={{ minHeight: '100vh', padding: 24 }}>
-      <Col xs={24} lg={10} xxl={9}>
-        <div className="sgde-page-grid">
-          <div className="sgde-page-hero">
-            <span className="sgde-chip">SGDE para entidades públicas colombianas</span>
-            <Typography.Title level={1} style={{ marginBottom: 0, maxWidth: 620 }}>
-              Gestión documental con trazabilidad, control y una interfaz administrativa seria.
-            </Typography.Title>
-            <Typography.Paragraph className="sgde-muted" style={{ fontSize: 16, maxWidth: 620 }}>
-              Accede a la demo funcional del sistema, administra documentos, radicados y usuarios, y valida el flujo completo con datos simulados preparados para conectarse con Spring Boot.
-            </Typography.Paragraph>
-          </div>
+    <div className="login-container" style={{ minHeight: '100vh', overflow: 'hidden' }}>
+      <Row gutter={[24, 24]} align="middle" justify="center" style={{ minHeight: '100vh', padding: 24 }}>
+        <Col xs={24} lg={10} xxl={9}>
+          <div className="login-hero">
+            <div style={{ marginBottom: 28 }}>
+              <div className="status-badge">
+                <span className="status-dot"></span>
+                <span>Sistema Operativo v2.0</span>
+              </div>
+            </div>
 
-          <Row gutter={[16, 16]}>
-            {[
-              {
-                icon: <BookOutlined />,
-                title: 'Documentos',
-                text: 'Registro, búsqueda y acciones sobre documentos institucionales.',
-              },
-              {
-                icon: <FileProtectOutlined />,
-                title: 'Radicados',
-                text: 'Control de comunicaciones oficiales y seguimiento por estado.',
-              },
-              {
-                icon: <CheckCircleOutlined />,
-                title: 'Usuarios',
-                text: 'Gestión de accesos y permisos para la operación interna.',
-              },
-            ].map((item) => (
-              <Col key={item.title} xs={24} md={8}>
-                <Card className="sgde-surface" styles={{ body: { display: 'grid', gap: 8 } }}>
-                  <Space align="center">
-                    <span
+            <Typography.Title
+              level={1}
+              className="hero-title"
+              style={{
+                marginBottom: 12,
+                maxWidth: 620,
+                fontSize: 44,
+                fontWeight: 800,
+                lineHeight: 1.15,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Gestión documental con trazabilidad completa
+            </Typography.Title>
+
+            <Typography.Paragraph
+              className="hero-subtitle"
+              style={{
+                fontSize: 16,
+                maxWidth: 620,
+                lineHeight: 1.6,
+                marginBottom: 32,
+              }}
+            >
+              Plataforma integral para la administración pública con control de acceso, reportería avanzada y auditoría completa de operaciones.
+            </Typography.Paragraph>
+
+            <Row gutter={[16, 16]}>
+              {[
+                {
+                  icon: <BookOutlined />,
+                  title: 'Documentos',
+                  text: 'Registro, búsqueda y clasificación automática de documentos institucionales.',
+                },
+                {
+                  icon: <FileProtectOutlined />,
+                  title: 'Radicados',
+                  text: 'Control centralizado y monitoreo en tiempo real de comunicaciones oficiales.',
+                },
+                {
+                  icon: <CheckCircleOutlined />,
+                  title: 'Usuarios',
+                  text: 'Gestión flexible de accesos, roles, permisos y auditoría completa.',
+                },
+              ].map((item, idx) => (
+                <Col key={item.title} xs={24} md={8} style={{ animation: `slideInUp 0.6s ease-out ${0.1 + idx * 0.1}s both` }}>
+                  <Card
+                    className="feature-card"
+                    style={{
+                      border: '1px solid rgba(15, 76, 129, 0.1)',
+                      borderRadius: 14,
+                      background: 'rgba(255, 255, 255, 0.5)',
+                      backdropFilter: 'blur(16px)',
+                      boxShadow: '0 8px 24px rgba(15, 76, 129, 0.08)',
+                    }}
+                    styles={{ body: { display: 'grid', gap: 12, padding: 20 } }}
+                  >
+                    <div
+                      className="feature-icon"
                       style={{
-                        width: 36,
-                        height: 36,
+                        width: 48,
+                        height: 48,
                         borderRadius: 12,
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'rgba(15, 76, 129, 0.1)',
+                        background: 'linear-gradient(135deg, rgba(15, 76, 129, 0.12), rgba(10, 127, 124, 0.08))',
                         color: 'var(--sgde-primary)',
+                        fontSize: 24,
                       }}
                     >
                       {item.icon}
-                    </span>
-                    <Typography.Text strong>{item.title}</Typography.Text>
-                  </Space>
-                  <Typography.Text className="sgde-muted">{item.text}</Typography.Text>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
-      </Col>
-
-      <Col xs={24} sm={20} md={16} lg={8} xxl={6}>
-        <Card className="sgde-surface" styles={{ body: { display: 'grid', gap: 20 } }}>
-          <div>
-            <Typography.Title level={3} style={{ marginBottom: 8 }}>
-              Ingreso al sistema
-            </Typography.Title>
-            <Typography.Text className="sgde-muted">
-              Use las credenciales demo prellenadas para acceder.
-            </Typography.Text>
+                    </div>
+                    <Typography.Text strong style={{ fontSize: 13, display: 'block' }}>
+                      {item.title}
+                    </Typography.Text>
+                    <Typography.Text className="sgde-muted" style={{ fontSize: 12, lineHeight: 1.5 }}>
+                      {item.text}
+                    </Typography.Text>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
           </div>
+        </Col>
 
-          <Alert
-            type="info"
-            showIcon
-            message="Credenciales demo"
-            description={`Correo: ${AUTH_DEMO_CREDENTIALS.email} · Contraseña: ${AUTH_DEMO_CREDENTIALS.password}`}
-          />
-
-          <Form form={form} layout="vertical" requiredMark={false} onFinish={onFinish}>
-            <Form.Item
-              label="Correo electrónico"
-              name="correo"
-              rules={[
-                { required: true, message: 'El correo electrónico es obligatorio.' },
-                { type: 'email', message: 'Ingrese un correo electrónico válido.' },
-              ]}
+        <Col xs={24} sm={20} md={16} lg={8} xxl={6}>
+          <div className="login-form-wrapper" style={{ animation: 'slideInRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
+            <Card
+              className="login-card"
+              style={{
+                border: '1px solid rgba(15, 76, 129, 0.12)',
+                borderRadius: 18,
+                background: 'rgba(255, 255, 255, 0.95)',
+                boxShadow: '0 32px 80px rgba(15, 76, 129, 0.15)',
+                backdropFilter: 'blur(20px)',
+              }}
+              styles={{
+                body: {
+                  padding: 32,
+                  display: 'grid',
+                  gap: 20,
+                },
+              }}
             >
-              <Input prefix={<UserOutlined />} placeholder="admin@sgde.gov.co" autoComplete="username" />
-            </Form.Item>
+              <div>
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 14,
+                    background: 'linear-gradient(135deg, rgba(15, 76, 129, 0.15), rgba(10, 127, 124, 0.1))',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: 16,
+                    border: '1px solid rgba(15, 76, 129, 0.15)',
+                  }}
+                >
+                  <LockOutlined style={{ fontSize: 28, color: 'var(--sgde-primary)' }} />
+                </div>
+                <Typography.Title
+                  level={3}
+                  className="login-title"
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 700,
+                    marginBottom: 6,
+                  }}
+                >
+                  Ingreso al sistema
+                </Typography.Title>
+                <Typography.Text className="sgde-muted" style={{ fontSize: 12 }}>
+                  Use las credenciales demo prellenadas
+                </Typography.Text>
+              </div>
 
-            <Form.Item
-              label="Contraseña"
-              name="contrasena"
-              rules={[{ required: true, message: 'La contraseña es obligatoria.' }]}
-            >
-              <Input.Password prefix={<LockOutlined />} placeholder="SGDE2026!" autoComplete="current-password" />
-            </Form.Item>
+              <Alert
+                type="success"
+                showIcon
+                className="alert-credentials"
+                message={
+                  <Typography.Text strong style={{ fontSize: 11, color: 'var(--sgde-accent)' }}>
+                    Credenciales de Demostración
+                  </Typography.Text>
+                }
+                description={
+                  <div style={{ fontSize: 10, marginTop: 6, display: 'grid', gap: 3 }}>
+                    <div>
+                      <Typography.Text code style={{ fontSize: 10 }}>
+                        {AUTH_DEMO_CREDENTIALS.email}
+                      </Typography.Text>
+                    </div>
+                    <div>
+                      <Typography.Text code style={{ fontSize: 10 }}>
+                        {AUTH_DEMO_CREDENTIALS.password}
+                      </Typography.Text>
+                    </div>
+                  </div>
+                }
+              />
 
-            <Button type="primary" htmlType="submit" block loading={loginMutation.isPending} size="large">
-              Ingresar
-            </Button>
-          </Form>
-        </Card>
-      </Col>
-    </Row>
+              <Form form={form} layout="vertical" requiredMark={false} onFinish={onFinish}>
+                <Form.Item
+                  label={<Typography.Text strong style={{ fontSize: 12 }}>Correo electrónico</Typography.Text>}
+                  name="correo"
+                  rules={[
+                    { required: true, message: 'El correo es obligatorio.' },
+                    { type: 'email', message: 'Correo no válido.' },
+                  ]}
+                  style={{ marginBottom: 16 }}
+                >
+                  <Input
+                    className="form-input"
+                    prefix={<UserOutlined style={{ color: 'var(--sgde-muted)' }} />}
+                    placeholder="admin@sgde.gov.co"
+                    autoComplete="username"
+                    style={{ height: 40 }}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label={<Typography.Text strong style={{ fontSize: 12 }}>Contraseña</Typography.Text>}
+                  name="contrasena"
+                  rules={[{ required: true, message: 'La contraseña es obligatoria.' }]}
+                  style={{ marginBottom: 24 }}
+                >
+                  <Input.Password
+                    className="form-input"
+                    prefix={<LockOutlined style={{ color: 'var(--sgde-muted)' }} />}
+                    placeholder="••••••••••"
+                    autoComplete="current-password"
+                    style={{ height: 40 }}
+                  />
+                </Form.Item>
+
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loginMutation.isPending}
+                  className="login-button"
+                  style={{ height: 44 }}
+                >
+                  {loginMutation.isPending ? 'Autenticando...' : 'Ingresar'}
+                </Button>
+              </Form>
+
+              <div style={{ paddingTop: 16, borderTop: '1px solid rgba(15, 76, 129, 0.08)', textAlign: 'center' }}>
+                <Typography.Text className="sgde-muted" style={{ fontSize: 10, letterSpacing: '0.02em' }}>
+                  SGDE v2.0 · Demostración · 2026
+                </Typography.Text>
+              </div>
+            </Card>
+          </div>
+        </Col>
+      </Row>
+    </div>
   );
 }
