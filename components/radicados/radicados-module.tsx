@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Drawer, Form, Grid, Input, Popconfirm, Select, Space, notification } from 'antd';
+import { Alert, App, Button, Drawer, Form, Grid, Input, Popconfirm, Select, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
@@ -29,6 +29,7 @@ const initialValues: RadicadoRequest = {
 };
 
 export function RadicadosModule() {
+  const { notification } = App.useApp();
   const screens = Grid.useBreakpoint();
   const table = useTableControls<Radicado>();
   const radicadosQuery = useRadicadosQuery({ q: table.query, page: table.page, pageSize: table.pageSize });
@@ -64,16 +65,16 @@ export function RadicadosModule() {
     try {
       if (editingItem) {
         await updateMutation.mutateAsync({ id: editingItem.id, payload: values });
-        notification.success({ message: 'Radicado actualizado', description: 'La información fue guardada correctamente.' });
+        notification.success({ title: 'Radicado actualizado', description: 'La información fue guardada correctamente.' });
       } else {
         await createMutation.mutateAsync(values);
-        notification.success({ message: 'Radicado creado', description: 'El radicado quedó disponible en la bandeja.' });
+        notification.success({ title: 'Radicado creado', description: 'El radicado quedó disponible en la bandeja.' });
       }
 
       closeDrawer();
     } catch (error) {
       notification.error({
-        message: editingItem ? 'Error al actualizar' : 'Error al crear',
+        title: editingItem ? 'Error al actualizar' : 'Error al crear',
         description: error instanceof Error ? error.message : 'No fue posible completar la operación.',
       });
     }
@@ -82,10 +83,10 @@ export function RadicadosModule() {
   const handleDelete = async (item: Radicado) => {
     try {
       await deleteMutation.mutateAsync(item.id);
-      notification.success({ message: 'Radicado eliminado', description: 'El registro se retiró del listado.' });
+      notification.success({ title: 'Radicado eliminado', description: 'El registro se retiró del listado.' });
     } catch (error) {
       notification.error({
-        message: 'Error al eliminar',
+        title: 'Error al eliminar',
         description: error instanceof Error ? error.message : 'No fue posible eliminar el radicado.',
       });
     }
@@ -139,7 +140,7 @@ export function RadicadosModule() {
       />
 
       {radicadosQuery.isError ? (
-        <Alert type="error" showIcon message="No fue posible cargar los radicados" description={(radicadosQuery.error as Error).message} />
+        <Alert type="error" showIcon title="No fue posible cargar los radicados" description={(radicadosQuery.error as Error).message} />
       ) : null}
 
       <ResourceTable<Radicado>

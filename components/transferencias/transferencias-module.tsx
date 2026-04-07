@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Button, Tag, notification } from 'antd';
+import { App, Button, Tag } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { PageHeader } from '@/components/shared/page-header';
@@ -45,6 +45,7 @@ function tipoTagColor(tipo: TipoTransferencia) {
 }
 
 export function TransferenciasModule() {
+  const { notification } = App.useApp();
   const table = useTableControls<Transferencia>();
   const [formOpen, setFormOpen] = useState(false);
   const [tipoConsulta, setTipoConsulta] = useState<TipoTransferencia>('Primaria');

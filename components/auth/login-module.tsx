@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BookOutlined, CheckCircleOutlined, FileProtectOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Alert, Button, Card, Col, Form, Input, Row, Space, Typography, notification } from 'antd';
+import { Alert, App, Button, Card, Col, Form, Input, Row, Space, Typography } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 import { login } from '@/services/auth.service';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -11,6 +11,7 @@ import { APP_ROUTES, AUTH_DEMO_CREDENTIALS } from '@/utils/constants';
 import type { LoginRequest } from '@/types/auth';
 
 export function LoginModule() {
+  const { notification } = App.useApp();
   const router = useRouter();
   const searchParams = useSearchParams();
   const setSession = useAuthStore((state) => state.setSession);
@@ -23,14 +24,14 @@ export function LoginModule() {
     onSuccess: (data) => {
       setSession(data.usuario);
       notification.success({
-        message: 'Inicio de sesión exitoso',
+        title: 'Inicio de sesión exitoso',
         description: 'Se habilitó el acceso a la consola administrativa.',
       });
       router.push(targetRoute);
     },
     onError: (error: unknown) => {
       const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión.';
-      notification.error({ message: 'Error de autenticación', description: message });
+      notification.error({ title: 'Error de autenticación', description: message });
     },
   });
 
@@ -198,7 +199,7 @@ export function LoginModule() {
                 type="success"
                 showIcon
                 className="alert-credentials"
-                message={
+                title={
                   <Typography.Text strong style={{ fontSize: 11, color: 'var(--sgde-accent)' }}>
                     Credenciales de Demostración
                   </Typography.Text>

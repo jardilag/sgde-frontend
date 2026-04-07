@@ -158,7 +158,7 @@ export function ExpedienteDetail({
               key: 'documentos',
               label: `Documentos (${expediente.documentosCount || 0})`,
               children: (
-                <Alert message="Documentos asociados serán listados aquí" type="info" showIcon />
+                <Alert title="Documentos asociados serán listados aquí" type="info" showIcon />
               ),
             },
             {

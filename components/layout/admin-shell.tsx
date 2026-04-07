@@ -17,7 +17,7 @@ import {
   SwapOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, Space, Spin, Tag, Tooltip, Typography, notification } from 'antd';
+import { App, Button, Layout, Menu, Space, Spin, Tag, Tooltip, Typography } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 import { logout } from '@/services/auth.service';
 import { useAuthStore } from '@/hooks/use-auth-store';
@@ -98,6 +98,7 @@ const menuItems = [
 ];
 
 export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>) {
+  const { notification } = App.useApp();
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -111,12 +112,12 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
     mutationFn: logout,
     onSuccess: () => {
       clearSession();
-      notification.success({ message: 'Sesión cerrada', description: 'La sesión se cerró correctamente.' });
+      notification.success({ title: 'Sesión cerrada', description: 'La sesión se cerró correctamente.' });
       router.push(APP_ROUTES.login);
     },
     onError: (error: unknown) => {
       const message = error instanceof Error ? error.message : 'No fue posible cerrar la sesión.';
-      notification.error({ message: 'Error al cerrar sesión', description: message });
+      notification.error({ title: 'Error al cerrar sesión', description: message });
     },
   });
 

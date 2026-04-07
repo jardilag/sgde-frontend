@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Alert, Button, Drawer, Form, Input, Popconfirm, Select, Space, notification } from 'antd';
+import { Alert, App, Button, Drawer, Form, Input, Popconfirm, Select, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
@@ -24,6 +24,7 @@ const initialValues: DependenciaRequest = {
 };
 
 export function DependenciasModule() {
+  const { notification } = App.useApp();
   const table = useTableControls<Dependencia>();
   const dependenciasQuery = useDependenciasQuery({ q: table.query, page: table.page, pageSize: table.pageSize });
   const { createMutation, updateMutation, deleteMutation } = useDependenciaMutations();
@@ -58,13 +59,13 @@ export function DependenciasModule() {
       if (editingItem) {
         await updateMutation.mutateAsync({ id: editingItem.id, payload: values });
         notification.success({
-          message: 'Dependencia actualizada',
+          title: 'Dependencia actualizada',
           description: 'La información quedó guardada correctamente.',
         });
       } else {
         await createMutation.mutateAsync(values);
         notification.success({
-          message: 'Dependencia creada',
+          title: 'Dependencia creada',
           description: 'La dependencia quedó disponible en el sistema.',
         });
       }
@@ -72,7 +73,7 @@ export function DependenciasModule() {
       closeDrawer();
     } catch (error) {
       notification.error({
-        message: editingItem ? 'Error al actualizar' : 'Error al crear',
+        title: editingItem ? 'Error al actualizar' : 'Error al crear',
         description: error instanceof Error ? error.message : 'No fue posible completar la operación.',
       });
     }
@@ -82,12 +83,12 @@ export function DependenciasModule() {
     try {
       await deleteMutation.mutateAsync(item.id);
       notification.success({
-        message: 'Dependencia eliminada',
+        title: 'Dependencia eliminada',
         description: 'El registro se retiró del listado.',
       });
     } catch (error) {
       notification.error({
-        message: 'Error al eliminar',
+        title: 'Error al eliminar',
         description: error instanceof Error ? error.message : 'No fue posible eliminar la dependencia.',
       });
     }
@@ -145,7 +146,7 @@ export function DependenciasModule() {
         <Alert
           type="error"
           showIcon
-          message="No fue posible cargar las dependencias"
+          title="No fue posible cargar las dependencias"
           description={(dependenciasQuery.error as Error).message}
         />
       ) : null}
