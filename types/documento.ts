@@ -28,6 +28,8 @@ export interface Documento {
   dependenciaNombre?: string;
   expedienteId?: string;
   expedienteCodigo?: string;
+  carpetaId?: string;
+  carpetaNombre?: string;
   observacion?: string;
   archivoNombre?: string;
   archivoUrl?: string;
@@ -46,6 +48,7 @@ export interface DocumentoRequest {
   fechaDocumento: string;
   dependenciaId: string;
   expedienteId?: string;
+  carpetaId?: string;
   observacion?: string;
   archivo: File;
 }

@@ -2,7 +2,7 @@
 import type { AuditoriaExportResponse, AuditoriaFilters, AuditoriaOptions, AuditoriaRegistro } from '@/types/auditoria';
 import type { Dependencia, DependenciaRequest } from '@/types/dependencia';
 import type { Documento, DocumentoRequest } from '@/types/documento';
-import type { Expediente, ExpedienteRequest, EstadoExpediente } from '@/types/expediente';
+import type { CarpetaExpediente, CarpetaExpedienteRequest, Expediente, ExpedienteRequest, EstadoExpediente } from '@/types/expediente';
 import type { Prestamo, PrestamoDevolucionRequest, PrestamoRequest } from '@/types/prestamo';
 import type { Radicado, RadicadoRequest } from '@/types/radicado';
 import type {
@@ -14,7 +14,7 @@ import type {
 } from '@/types/transferencia';
 import type { Serie, SerieRequest, Subserie, SubserieRequest } from '@/types/trd';
 import type { Usuario, UsuarioRequest } from '@/types/usuario';
-import { AUTH_DEMO_CREDENTIALS } from '@/utils/constants';
+import { AUTH_DEMO_USERS } from '@/utils/constants';
 
 const now = () => new Date().toISOString();
 const randomUUID = () => globalThis.crypto.randomUUID();
@@ -356,7 +356,7 @@ const subserieSeed: Subserie[] = [
 
 const expedienteSeed: Expediente[] = [
   {
-    id: randomUUID(),
+    id: 'exp-2026-0001',
     codigoExpediente: 'EXP-2026-0001',
     nombre: 'Contratacion de servicios legales',
     fechaApertura: '2026-03-15',
@@ -368,7 +368,7 @@ const expedienteSeed: Expediente[] = [
     updatedAt: now(),
   },
   {
-    id: randomUUID(),
+    id: 'exp-2026-0002',
     codigoExpediente: 'EXP-2026-0002',
     nombre: 'Resolucion estrategica de planeacion',
     fechaApertura: '2026-03-10',
@@ -381,7 +381,7 @@ const expedienteSeed: Expediente[] = [
     updatedAt: now(),
   },
   {
-    id: randomUUID(),
+    id: 'exp-2026-0003',
     codigoExpediente: 'EXP-2026-0003',
     nombre: 'Memorandos de circulacion interna',
     fechaApertura: '2026-03-20',
@@ -393,7 +393,7 @@ const expedienteSeed: Expediente[] = [
     updatedAt: now(),
   },
   {
-    id: randomUUID(),
+    id: 'exp-2026-0004',
     codigoExpediente: 'EXP-2026-0004',
     nombre: 'Correspondencia interinstitucional',
     fechaApertura: '2026-02-28',
@@ -405,7 +405,7 @@ const expedienteSeed: Expediente[] = [
     updatedAt: now(),
   },
   {
-    id: randomUUID(),
+    id: 'exp-2026-0005',
     codigoExpediente: 'EXP-2026-0005',
     nombre: 'Acuerdos de junta directiva Q1',
     fechaApertura: '2026-01-15',
@@ -418,7 +418,7 @@ const expedienteSeed: Expediente[] = [
     updatedAt: now(),
   },
   {
-    id: randomUUID(),
+    id: 'exp-2026-0006',
     codigoExpediente: 'EXP-2026-0006',
     nombre: 'Asesorias juridicas en curso',
     fechaApertura: '2026-03-22',
@@ -430,6 +430,36 @@ const expedienteSeed: Expediente[] = [
     updatedAt: now(),
   },
 ];
+
+const carpetasBaseExpediente = [
+  {
+    nombre: '01 - Principal',
+    descripcion: 'Documentos principales que conforman el expediente.',
+  },
+  {
+    nombre: '02 - Comunicaciones',
+    descripcion: 'Oficios, memorandos, comunicaciones recibidas y enviadas.',
+  },
+  {
+    nombre: '03 - Soportes',
+    descripcion: 'Evidencias, certificaciones, soportes tecnicos o administrativos.',
+  },
+  {
+    nombre: '04 - Anexos',
+    descripcion: 'Anexos y documentos complementarios relacionados.',
+  },
+];
+
+const carpetaExpedienteSeed: CarpetaExpediente[] = expedienteSeed.flatMap((expediente) =>
+  carpetasBaseExpediente.map((carpeta, index) => ({
+    id: `${expediente.id}-carpeta-${index + 1}`,
+    expedienteId: expediente.id,
+    nombre: carpeta.nombre,
+    descripcion: carpeta.descripcion,
+    createdAt: now(),
+    updatedAt: now(),
+  })),
+);
 
 const prestamoSeed: Prestamo[] = [
   {
@@ -572,9 +602,14 @@ type MockDatabase = {
   subseries: Subserie[];
   usuarios: Usuario[];
   expedientes: Expediente[];
+  carpetasExpediente: CarpetaExpediente[];
 };
 
-const database: MockDatabase = {
+declare global {
+  var __SGDE_MOCK_DB__: MockDatabase | undefined;
+}
+
+const database: MockDatabase = globalThis.__SGDE_MOCK_DB__ ??= {
   auditoria: auditoriaSeed,
   dependencias: dependenciaSeed,
   documentos: documentoSeed,
@@ -585,6 +620,7 @@ const database: MockDatabase = {
   subseries: subserieSeed,
   usuarios: usuarioSeed,
   expedientes: expedienteSeed,
+  carpetasExpediente: carpetaExpedienteSeed,
 };
 
 const normalize = (value: string) => value.toLowerCase().trim();
@@ -628,13 +664,26 @@ function resolvePrestamoEstado(prestamo: Prestamo) {
   return 'Activo' as const;
 }
 
-export function getDemoUser() {
+export function getDemoUser(sessionToken: string = AUTH_DEMO_USERS[0].token) {
+  const user = AUTH_DEMO_USERS.find((item) => item.token === sessionToken) ?? AUTH_DEMO_USERS[0];
+
   return {
-    id: 'demo-admin',
-    nombre: 'Administrador SGDE',
-    email: AUTH_DEMO_CREDENTIALS.email,
-    rol: 'Administrador',
-    dependencia: 'Secretaria General',
+    id: user.id,
+    nombre: user.nombre,
+    email: user.email,
+    rol: user.rol,
+    dependencia: user.dependencia,
+  };
+}
+
+export function getDemoUserByCredentials(correo: string, contrasena: string) {
+  const user = AUTH_DEMO_USERS.find((item) => item.email === correo && item.password === contrasena);
+
+  if (!user) return null;
+
+  return {
+    token: user.token,
+    usuario: getDemoUser(user.token),
   };
 }
 
@@ -648,6 +697,7 @@ function nextDocumentoRadicado() {
 function buildDocumentoRecord(payload: DocumentoRequest, existing?: Documento): Documento {
   const dependencia = database.dependencias.find((item) => item.id === payload.dependenciaId);
   const expediente = payload.expedienteId ? database.expedientes.find((item) => item.id === payload.expedienteId) : undefined;
+  const carpeta = payload.carpetaId ? database.carpetasExpediente.find((item) => item.id === payload.carpetaId) : undefined;
   const generatedRadicado = existing?.numeroRadicado ?? existing?.radicado ?? nextDocumentoRadicado();
   const file = payload.archivo;
   const metadata = file
@@ -673,6 +723,8 @@ function buildDocumentoRecord(payload: DocumentoRequest, existing?: Documento): 
     dependencia: dependencia?.nombre ?? existing?.dependencia ?? 'Sin dependencia',
     expedienteId: payload.expedienteId,
     expedienteCodigo: expediente?.codigoExpediente,
+    carpetaId: payload.carpetaId,
+    carpetaNombre: carpeta?.nombre,
     observacion: payload.observacion,
     archivoNombre: file?.name ?? existing?.archivoNombre,
     mimeType: file?.type || existing?.mimeType,
@@ -717,6 +769,8 @@ export function listDocumentos(filters: {
         documento.tipoRadicado ?? '',
         documento.dependencia,
         documento.dependenciaNombre ?? '',
+        documento.expedienteCodigo ?? '',
+        documento.carpetaNombre ?? '',
         documento.funcionarioResponsable,
         documento.estado,
         documento.observacion ?? '',
@@ -1300,7 +1354,19 @@ export function listExpedientes(filters: {
 }
 
 export function getExpedienteById(id: string) {
-  return database.expedientes.find((item) => item.id === id) ?? null;
+  const expediente = database.expedientes.find((item) => item.id === id);
+
+  if (!expediente) return null;
+
+  const carpetas = listCarpetasExpediente(id);
+
+  return {
+    ...expediente,
+    carpetas,
+    carpetasCount: carpetas.length,
+    documentosCount: database.documentos.filter((item) => item.expedienteId === id).length,
+    historialCount: 1,
+  };
 }
 
 export function createExpediente(payload: ExpedienteRequest) {
@@ -1312,6 +1378,7 @@ export function createExpediente(payload: ExpedienteRequest) {
   };
 
   database.expedientes = [expediente, ...database.expedientes];
+  carpetasBaseExpediente.forEach((carpeta) => createCarpetaExpediente(expediente.id, carpeta));
   return expediente;
 }
 
@@ -1333,7 +1400,30 @@ export function updateExpediente(id: string, payload: Partial<ExpedienteRequest>
 export function deleteExpediente(id: string) {
   const before = database.expedientes.length;
   database.expedientes = database.expedientes.filter((item) => item.id !== id);
+  database.carpetasExpediente = database.carpetasExpediente.filter((item) => item.expedienteId !== id);
   return database.expedientes.length !== before;
+}
+
+export function listCarpetasExpediente(expedienteId: string) {
+  return applySort(database.carpetasExpediente.filter((item) => item.expedienteId === expedienteId));
+}
+
+export function createCarpetaExpediente(expedienteId: string, payload: CarpetaExpedienteRequest) {
+  const expediente = database.expedientes.find((item) => item.id === expedienteId);
+
+  if (!expediente) return null;
+
+  const carpeta: CarpetaExpediente = {
+    id: randomUUID(),
+    expedienteId,
+    nombre: payload.nombre.trim(),
+    descripcion: payload.descripcion?.trim() || undefined,
+    createdAt: now(),
+    updatedAt: now(),
+  };
+
+  database.carpetasExpediente = [carpeta, ...database.carpetasExpediente];
+  return carpeta;
 }
 
 export function cerrarExpediente(id: string, fechaCierre: string) {
@@ -1423,4 +1513,3 @@ export function getDashboardSummary(): DashboardSummary {
     alertasVencimientos: [...alertasPrestamos, ...alertasTransferencia],
   };
 }
-

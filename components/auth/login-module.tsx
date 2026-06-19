@@ -3,11 +3,11 @@
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { BookOutlined, CheckCircleOutlined, FileProtectOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Alert, App, Button, Card, Col, Form, Input, Row, Space, Typography } from 'antd';
+import { Alert, App, Button, Card, Col, Form, Input, Row, Typography } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 import { login } from '@/services/auth.service';
 import { useAuthStore } from '@/hooks/use-auth-store';
-import { APP_ROUTES, AUTH_DEMO_CREDENTIALS } from '@/utils/constants';
+import { APP_ROUTES, AUTH_DEMO_CREDENTIALS, AUTH_DEMO_USERS } from '@/utils/constants';
 import type { LoginRequest } from '@/types/auth';
 
 export function LoginModule() {
@@ -23,11 +23,14 @@ export function LoginModule() {
     mutationFn: login,
     onSuccess: (data) => {
       setSession(data.usuario);
+      const nextRoute = data.usuario.rol === 'Gestor documental' && targetRoute === APP_ROUTES.dashboard
+        ? APP_ROUTES.documentos
+        : targetRoute;
       notification.success({
         title: 'Inicio de sesión exitoso',
         description: 'Se habilitó el acceso a la consola administrativa.',
       });
-      router.push(targetRoute);
+      router.push(nextRoute);
     },
     onError: (error: unknown) => {
       const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión.';
@@ -205,17 +208,17 @@ export function LoginModule() {
                   </Typography.Text>
                 }
                 description={
-                  <div style={{ fontSize: 10, marginTop: 6, display: 'grid', gap: 3 }}>
-                    <div>
-                      <Typography.Text code style={{ fontSize: 10 }}>
-                        {AUTH_DEMO_CREDENTIALS.email}
-                      </Typography.Text>
-                    </div>
-                    <div>
-                      <Typography.Text code style={{ fontSize: 10 }}>
-                        {AUTH_DEMO_CREDENTIALS.password}
-                      </Typography.Text>
-                    </div>
+                  <div style={{ fontSize: 10, marginTop: 6, display: 'grid', gap: 6 }}>
+                    {AUTH_DEMO_USERS.map((user) => (
+                      <div key={user.email} style={{ display: 'grid', gap: 2 }}>
+                        <Typography.Text strong style={{ fontSize: 10 }}>
+                          {user.rol}
+                        </Typography.Text>
+                        <Typography.Text code style={{ fontSize: 10 }}>
+                          {user.email} / {user.password}
+                        </Typography.Text>
+                      </div>
+                    ))}
                   </div>
                 }
               />

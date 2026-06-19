@@ -103,10 +103,17 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const { user, setSession, clearSession } = useAuthStore();
+  const activeUser = user ?? initialUser;
 
   useEffect(() => {
     setSession(initialUser);
   }, [initialUser, setSession]);
+
+  useEffect(() => {
+    if (initialUser.rol === 'Gestor documental' && pathname === APP_ROUTES.dashboard) {
+      router.replace(APP_ROUTES.documentos);
+    }
+  }, [initialUser.rol, pathname, router]);
 
   const logoutMutation = useMutation({
     mutationFn: logout,
@@ -122,6 +129,9 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
   });
 
   const selectedKey = getSelectedKey(pathname);
+  const visibleMenuItems = initialUser.rol === 'Gestor documental'
+    ? menuItems.filter((item) => item.key === APP_ROUTES.documentos || item.key === APP_ROUTES.expedientes)
+    : menuItems;
 
   return (
     <Layout className="sgde-app-shell" style={{ minHeight: '100vh', background: 'transparent' }}>
@@ -168,17 +178,17 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
               </div>
             )}
           </Space>
-          {collapsed ? null : <Tag color="blue">Demo administrativa</Tag>}
+          {collapsed ? null : <Tag color="blue">{initialUser.rol === 'Gestor documental' ? 'Mesa de radicación' : 'Demo administrativa'}</Tag>}
         </div>
         <Menu
           selectedKeys={[selectedKey]}
-          items={menuItems}
+          items={visibleMenuItems}
           mode="inline"
           style={{ borderInlineEnd: 0, background: 'transparent', paddingInline: 10 }}
         />
       </Sider>
 
-      <Layout style={{ background: 'transparent' }}>
+      <Layout style={{ background: 'transparent', minWidth: 0 }}>
         <Header
           style={{
             margin: '16px 16px 0 0',
@@ -207,9 +217,9 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
 
           <Space align="center" size={12} wrap>
             <div style={{ textAlign: 'right' }}>
-              <Typography.Text strong>{user?.nombre ?? initialUser.nombre}</Typography.Text>
+              <Typography.Text strong>{activeUser.nombre}</Typography.Text>
               <Typography.Text className="sgde-muted" style={{ display: 'block' }}>
-                {user?.dependencia ?? initialUser.dependencia}
+                {activeUser.rol} · {activeUser.dependencia}
               </Typography.Text>
             </div>
             <Tooltip title="Cerrar sesión" placement="bottom">
@@ -225,8 +235,8 @@ export function AdminShell({ initialUser, children }: Readonly<AdminShellProps>)
           </Space>
         </Header>
 
-        <Content style={{ padding: 16, marginTop: 0 }}>
-          <div style={{ padding: 24, minHeight: 'calc(100vh - 116px)', display: 'grid', gap: 24 }}>
+        <Content style={{ padding: 16, marginTop: 0, minWidth: 0, overflowX: 'hidden' }}>
+          <div style={{ padding: 24, minHeight: 'calc(100vh - 116px)', display: 'grid', gap: 24, minWidth: 0, maxWidth: '100%' }}>
             {children}
           </div>
         </Content>

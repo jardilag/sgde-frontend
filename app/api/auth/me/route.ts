@@ -8,8 +8,8 @@ export async function GET() {
   const session = cookieStore.get(SESSION_COOKIE_NAME);
 
   if (!session) {
-    return NextResponse.json({ message: 'No hay sesión activa.' }, { status: 401 });
+    return NextResponse.json({ message: 'No hay sesion activa.' }, { status: 401 });
   }
 
-  return NextResponse.json({ user: getDemoUser() }, { status: 200 });
+  return NextResponse.json({ user: getDemoUser(session.value) }, { status: 200 });
 }

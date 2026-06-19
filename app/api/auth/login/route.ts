@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDemoUser } from '@/services/mock-db';
+import { getDemoUserByCredentials } from '@/services/mock-db';
 import { SESSION_COOKIE_NAME } from '@/utils/constants';
 import { validateDemoCredentials, validateLoginPayload } from '@/utils/validators';
 
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     if (!validation.valid) {
       return NextResponse.json(
-        { message: 'Verifique la información enviada.', errors: validation.errors },
+        { message: 'Verifique la informacion enviada.', errors: validation.errors },
         { status: 400 },
       );
     }
@@ -20,21 +20,30 @@ export async function POST(request: Request) {
 
     if (!validateDemoCredentials(correo, contrasena)) {
       return NextResponse.json(
-        { message: 'Credenciales inválidas. Use la cuenta demo configurada.' },
+        { message: 'Credenciales invalidas. Use una cuenta demo configurada.' },
+        { status: 401 },
+      );
+    }
+
+    const session = getDemoUserByCredentials(correo, contrasena);
+
+    if (!session) {
+      return NextResponse.json(
+        { message: 'Credenciales invalidas. Use una cuenta demo configurada.' },
         { status: 401 },
       );
     }
 
     const response = NextResponse.json(
       {
-        message: 'Sesión iniciada correctamente.',
-        token: 'demo-session-token',
-        usuario: getDemoUser(),
+        message: 'Sesion iniciada correctamente.',
+        token: session.token,
+        usuario: session.usuario,
       },
       { status: 200 },
     );
 
-    response.cookies.set(SESSION_COOKIE_NAME, 'demo-session-token', {
+    response.cookies.set(SESSION_COOKIE_NAME, session.token, {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
@@ -42,6 +51,6 @@ export async function POST(request: Request) {
 
     return response;
   } catch {
-    return NextResponse.json({ message: 'No fue posible iniciar sesión.' }, { status: 500 });
+    return NextResponse.json({ message: 'No fue posible iniciar sesion.' }, { status: 500 });
   }
 }

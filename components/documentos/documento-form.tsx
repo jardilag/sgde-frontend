@@ -5,6 +5,7 @@ import { Button, Form, Input, Modal, Progress, Select, Space, Upload, message } 
 import type { UploadFile, UploadProps } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { Documento, DocumentoRequest, TipoRadicadoDocumento } from '@/types/documento';
+import { EstadoExpediente, type CarpetaExpediente, type CarpetaExpedienteRequest, type Expediente, type ExpedienteRequest } from '@/types/expediente';
 
 const allowedMimeTypes = new Set([
   'application/pdf',
@@ -57,30 +58,135 @@ interface DocumentoFormValues {
   fechaDocumento: string;
   dependenciaId: string;
   expedienteId?: string;
+  carpetaId?: string;
   observacion?: string;
   archivo?: UploadFile[];
+}
+
+interface ExpedienteQuickFormValues {
+  codigoExpediente: string;
+  nombre: string;
+  dependenciaId: string;
+  subserieId: string;
+  observacion?: string;
+}
+
+interface CarpetaQuickFormValues {
+  nombre: string;
+  descripcion?: string;
 }
 
 type DocumentoFormProps = Readonly<{
   open: boolean;
   loading: boolean;
+  initialExpedienteId?: string | null;
   onClose: () => void;
   onSubmit: (payload: DocumentoRequest, onProgress: (progress: number) => void) => Promise<Documento>;
   dependencias: Array<{ label: string; value: string }>;
   expedientes: Array<{ label: string; value: string }>;
+  subseries: Array<{ label: string; value: string }>;
+  carpetas: Array<{ label: string; value: string }>;
+  carpetasLoading: boolean;
+  onExpedienteChange: (expedienteId: string | null) => void;
+  onCreateExpediente: (payload: ExpedienteRequest) => Promise<Expediente>;
+  onCreateCarpeta: (expedienteId: string, payload: CarpetaExpedienteRequest) => Promise<CarpetaExpediente>;
 }>;
 
-export function DocumentoForm({ open, loading, onClose, onSubmit, dependencias, expedientes }: DocumentoFormProps) {
+export function DocumentoForm({
+  open,
+  loading,
+  initialExpedienteId,
+  onClose,
+  onSubmit,
+  dependencias,
+  expedientes,
+  subseries,
+  carpetas,
+  carpetasLoading,
+  onExpedienteChange,
+  onCreateExpediente,
+  onCreateCarpeta,
+}: DocumentoFormProps) {
   const [form] = Form.useForm<DocumentoFormValues>();
+  const [expedienteForm] = Form.useForm<ExpedienteQuickFormValues>();
+  const [carpetaForm] = Form.useForm<CarpetaQuickFormValues>();
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [expedienteModalOpen, setExpedienteModalOpen] = useState(false);
+  const [carpetaModalOpen, setCarpetaModalOpen] = useState(false);
+  const [quickCreateLoading, setQuickCreateLoading] = useState(false);
+  const selectedExpedienteId = Form.useWatch('expedienteId', form);
+  const currentExpedienteId = selectedExpedienteId ?? initialExpedienteId ?? null;
   const uploadButtonLabel = useMemo(() => (loading ? 'Radicando...' : 'Adjuntar archivo'), [loading]);
 
   useEffect(() => {
     if (!open) {
       form.resetFields();
-      setUploadProgress(0);
     }
   }, [form, open]);
+
+  useEffect(() => {
+    if (open && initialExpedienteId) {
+      form.setFieldsValue({ expedienteId: initialExpedienteId, carpetaId: undefined });
+      onExpedienteChange(initialExpedienteId);
+    }
+  }, [form, initialExpedienteId, onExpedienteChange, open]);
+
+  const handleClose = () => {
+    setUploadProgress(0);
+    onExpedienteChange(null);
+    onClose();
+  };
+
+  const handleCreateExpediente = async (values: ExpedienteQuickFormValues) => {
+    setQuickCreateLoading(true);
+
+    try {
+      const expediente = await onCreateExpediente({
+        codigoExpediente: values.codigoExpediente,
+        nombre: values.nombre,
+        fechaApertura: new Date().toISOString().slice(0, 10),
+        estadoActual: EstadoExpediente.ABIERTO,
+        dependenciaId: values.dependenciaId,
+        subserieId: values.subserieId,
+        observacion: values.observacion?.trim() || undefined,
+      });
+
+      form.setFieldsValue({ expedienteId: expediente.id, carpetaId: undefined });
+      onExpedienteChange(expediente.id);
+      expedienteForm.resetFields();
+      setExpedienteModalOpen(false);
+      message.success('Expediente creado y seleccionado.');
+    } catch {
+      message.error('No fue posible crear el expediente.');
+    } finally {
+      setQuickCreateLoading(false);
+    }
+  };
+
+  const handleCreateCarpeta = async (values: CarpetaQuickFormValues) => {
+    if (!currentExpedienteId) {
+      message.warning('Selecciona un expediente antes de crear la carpeta.');
+      return;
+    }
+
+    setQuickCreateLoading(true);
+
+    try {
+      const carpeta = await onCreateCarpeta(currentExpedienteId, {
+        nombre: values.nombre,
+        descripcion: values.descripcion?.trim() || undefined,
+      });
+
+      form.setFieldsValue({ carpetaId: carpeta.id });
+      carpetaForm.resetFields();
+      setCarpetaModalOpen(false);
+      message.success('Carpeta creada y seleccionada.');
+    } catch {
+      message.error('No fue posible crear la carpeta.');
+    } finally {
+      setQuickCreateLoading(false);
+    }
+  };
 
   const handleFinish = async (values: DocumentoFormValues) => {
     const validationMessage = isValidFileList(values.archivo);
@@ -97,6 +203,7 @@ export function DocumentoForm({ open, loading, onClose, onSubmit, dependencias, 
       fechaDocumento: values.fechaDocumento,
       dependenciaId: values.dependenciaId,
       expedienteId: values.expedienteId || undefined,
+      carpetaId: values.carpetaId || undefined,
       observacion: values.observacion?.trim() || undefined,
       archivo,
     };
@@ -105,6 +212,7 @@ export function DocumentoForm({ open, loading, onClose, onSubmit, dependencias, 
       await onSubmit(payload, setUploadProgress);
       form.resetFields();
       setUploadProgress(0);
+      onExpedienteChange(null);
       onClose();
     } catch {
       // The parent handles the notification and the drawer stays open.
@@ -132,10 +240,10 @@ export function DocumentoForm({ open, loading, onClose, onSubmit, dependencias, 
       title="Nueva radicación documental"
       width={760}
       destroyOnHidden
-      onCancel={onClose}
+      onCancel={handleClose}
       footer={
         <Space>
-          <Button onClick={onClose}>Cancelar</Button>
+          <Button onClick={handleClose}>Cancelar</Button>
           <Button type="primary" htmlType="submit" form="documento-radicacion-form" loading={loading}>
             Radicar
           </Button>
@@ -173,12 +281,41 @@ export function DocumentoForm({ open, loading, onClose, onSubmit, dependencias, 
           />
         </Form.Item>
 
-        <Form.Item label="Expediente" name="expedienteId">
-          <Select
-            allowClear
-            placeholder="Asociar a expediente si aplica"
-            options={expedientes}
-          />
+        <Form.Item label="Expediente" required>
+          <Space.Compact style={{ width: '100%' }}>
+            <Form.Item name="expedienteId" noStyle rules={[{ required: true, message: 'Selecciona o crea el expediente.' }]}>
+              <Select
+                showSearch
+                allowClear
+                placeholder="Buscar o asociar expediente"
+                options={expedientes}
+                filterOption={(input, option) => String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                onChange={(value) => {
+                  form.setFieldsValue({ carpetaId: undefined });
+                  onExpedienteChange(value ?? null);
+                }}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+            <Button onClick={() => setExpedienteModalOpen(true)}>Nuevo</Button>
+          </Space.Compact>
+        </Form.Item>
+
+        <Form.Item label="Carpeta del expediente" required>
+          <Space.Compact style={{ width: '100%' }}>
+            <Form.Item name="carpetaId" noStyle rules={[{ required: true, message: 'Selecciona la carpeta donde se guardará el documento.' }]}>
+              <Select
+                showSearch
+                disabled={!currentExpedienteId}
+                loading={carpetasLoading}
+                placeholder={currentExpedienteId ? 'Selecciona carpeta' : 'Selecciona primero un expediente'}
+                options={carpetas}
+                filterOption={(input, option) => String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                style={{ width: '100%' }}
+              />
+            </Form.Item>
+            <Button disabled={!currentExpedienteId} onClick={() => setCarpetaModalOpen(true)}>Nueva</Button>
+          </Space.Compact>
         </Form.Item>
 
         <Form.Item
@@ -205,6 +342,51 @@ export function DocumentoForm({ open, loading, onClose, onSubmit, dependencias, 
 
         <Progress percent={loading ? uploadProgress : 0} status={loading ? 'active' : 'normal'} showInfo={loading} />
       </Form>
+
+      <Modal
+        open={expedienteModalOpen}
+        title="Crear expediente"
+        onCancel={() => setExpedienteModalOpen(false)}
+        onOk={() => expedienteForm.submit()}
+        confirmLoading={quickCreateLoading}
+        destroyOnHidden
+      >
+        <Form form={expedienteForm} layout="vertical" onFinish={handleCreateExpediente}>
+          <Form.Item name="codigoExpediente" label="Código" rules={[{ required: true, message: 'Ingresa el código.' }]}>
+            <Input placeholder="EXP-2026-0007" />
+          </Form.Item>
+          <Form.Item name="nombre" label="Nombre" rules={[{ required: true, message: 'Ingresa el nombre.' }]}>
+            <Input placeholder="Nombre del expediente" />
+          </Form.Item>
+          <Form.Item name="dependenciaId" label="Dependencia" rules={[{ required: true, message: 'Selecciona la dependencia.' }]}>
+            <Select options={dependencias} />
+          </Form.Item>
+          <Form.Item name="subserieId" label="Subserie" rules={[{ required: true, message: 'Selecciona la subserie.' }]}>
+            <Select options={subseries} />
+          </Form.Item>
+          <Form.Item name="observacion" label="Observación">
+            <Input.TextArea rows={3} placeholder="Notas del expediente" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        open={carpetaModalOpen}
+        title="Crear carpeta"
+        onCancel={() => setCarpetaModalOpen(false)}
+        onOk={() => carpetaForm.submit()}
+        confirmLoading={quickCreateLoading}
+        destroyOnHidden
+      >
+        <Form form={carpetaForm} layout="vertical" onFinish={handleCreateCarpeta}>
+          <Form.Item name="nombre" label="Nombre" rules={[{ required: true, message: 'Ingresa el nombre.' }]}>
+            <Input placeholder="Carpeta principal, Anexos, Soportes..." />
+          </Form.Item>
+          <Form.Item name="descripcion" label="Descripción">
+            <Input.TextArea rows={3} placeholder="Descripción opcional" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </Modal>
   );
 }

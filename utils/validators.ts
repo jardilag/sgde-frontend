@@ -1,4 +1,4 @@
-import { AUTH_DEMO_CREDENTIALS } from '@/utils/constants';
+import { AUTH_DEMO_USERS } from '@/utils/constants';
 
 type ValidationResult = {
   valid: boolean;
@@ -33,7 +33,7 @@ export function validateLoginPayload(payload: { correo?: unknown; contrasena?: u
 }
 
 export function validateDemoCredentials(correo: string, contrasena: string) {
-  return correo === AUTH_DEMO_CREDENTIALS.email && contrasena === AUTH_DEMO_CREDENTIALS.password;
+  return AUTH_DEMO_USERS.some((user) => user.email === correo && user.password === contrasena);
 }
 
 const isFileLike = (value: unknown) =>
@@ -47,8 +47,8 @@ export function validateDocumentoPayload(payload: Record<string, unknown>): Vali
   if (!nonEmpty(payload.titulo)) errors.titulo = 'El título es obligatorio.';
   if (!isIsoDateString(payload.fechaDocumento)) errors.fechaDocumento = 'La fecha del documento es obligatoria.';
   if (!nonEmpty(payload.dependenciaId)) errors.dependenciaId = 'La dependencia es obligatoria.';
-  if (payload.expedienteId !== undefined && payload.expedienteId !== null && payload.expedienteId !== '' && !nonEmpty(payload.expedienteId))
-    errors.expedienteId = 'El expediente seleccionado no es válido.';
+  if (!nonEmpty(payload.expedienteId)) errors.expedienteId = 'El expediente es obligatorio.';
+  if (!nonEmpty(payload.carpetaId)) errors.carpetaId = 'La carpeta del expediente es obligatoria.';
   if (!isFileLike(payload.archivo)) errors.archivo = 'Debe adjuntar un archivo válido.';
 
   return {

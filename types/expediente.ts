@@ -26,6 +26,20 @@ export interface Expediente {
   updatedAt: string;
 }
 
+export interface CarpetaExpediente {
+  id: string;
+  expedienteId: string;
+  nombre: string;
+  descripcion?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CarpetaExpedienteRequest {
+  nombre: string;
+  descripcion?: string;
+}
+
 /**
  * Solicitud para crear o actualizar expediente
  */
@@ -68,6 +82,8 @@ export interface ExpedienteExtended extends Expediente {
   };
   documentosCount?: number;
   historialCount?: number;
+  carpetas?: CarpetaExpediente[];
+  carpetasCount?: number;
 }
 
 /**
@@ -88,6 +104,7 @@ export interface HistorialExpediente {
 export interface DocumentoExpediente {
   id: string;
   expedienteId: string;
+  carpetaId?: string;
   radicadoId?: string;
   titulo: string;
   tipoDocumento: string;

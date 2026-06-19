@@ -2,7 +2,7 @@ export interface AuthUser {
   id: string;
   nombre: string;
   email: string;
-  rol: string;
+  rol: 'Administrador' | 'Gestor documental' | 'Consulta';
   dependencia: string;
 }
 

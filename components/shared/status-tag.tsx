@@ -12,7 +12,6 @@ const colorMap: Record<string, string> = {
   abierto: 'geekblue',
   cerrado: 'green',
   pendiente: 'orange',
-  activo: 'processing',
   devuelto: 'green',
   vencido: 'red',
 };

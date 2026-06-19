@@ -4,7 +4,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { expedienteService } from '@/services/expediente.service';
-import { ExpedienteRequest, ExpedienteFilters } from '@/types/expediente';
+import { CarpetaExpedienteRequest, ExpedienteRequest, ExpedienteFilters } from '@/types/expediente';
 
 // Query keys
 export const expedienteKeys = {
@@ -15,6 +15,7 @@ export const expedienteKeys = {
   detail: (id: string) => [...expedienteKeys.details(), id] as const,
   historial: (id: string) => [...expedienteKeys.detail(id), 'historial'] as const,
   documentos: (id: string) => [...expedienteKeys.detail(id), 'documentos'] as const,
+  carpetas: (id: string) => [...expedienteKeys.detail(id), 'carpetas'] as const,
 };
 
 /**
@@ -62,6 +63,30 @@ export function useDocumentosQuery(expedienteId: string | null) {
     enabled: !!expedienteId,
     staleTime: 1000 * 60 * 5,
   });
+}
+
+export function useCarpetasExpedienteQuery(expedienteId: string | null) {
+  return useQuery({
+    queryKey: expedienteKeys.carpetas(expedienteId || ''),
+    queryFn: () => expedienteService.fetchCarpetas(expedienteId!),
+    enabled: !!expedienteId,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useCarpetaExpedienteMutations() {
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: ({ expedienteId, payload }: { expedienteId: string; payload: CarpetaExpedienteRequest }) =>
+      expedienteService.createCarpeta(expedienteId, payload),
+    onSuccess: (_, { expedienteId }) => {
+      queryClient.invalidateQueries({ queryKey: expedienteKeys.carpetas(expedienteId) });
+      queryClient.invalidateQueries({ queryKey: expedienteKeys.detail(expedienteId) });
+    },
+  });
+
+  return { createMutation };
 }
 
 /**

@@ -1,4 +1,6 @@
 :root {
+  --font-manrope: "Segoe UI", Arial, sans-serif;
+  --font-ibm-plex-mono: "Cascadia Mono", Consolas, monospace;
   --sgde-background: #eef3f8;
   --sgde-background-deep: #dfe8f1;
   --sgde-foreground: #102033;
@@ -95,6 +97,8 @@ samp {
 .sgde-page-grid {
   display: grid;
   gap: 24px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .sgde-page-hero {

@@ -1,8 +1,29 @@
 ﻿export const SESSION_COOKIE_NAME = 'sgde_session';
 
+export const AUTH_DEMO_USERS = [
+  {
+    id: 'demo-admin',
+    nombre: 'Administrador SGDE',
+    email: 'admin@sgde.gov.co',
+    password: 'SGDE2026!',
+    rol: 'Administrador',
+    dependencia: 'Secretaria General',
+    token: 'demo-admin-session-token',
+  },
+  {
+    id: 'demo-gestor',
+    nombre: 'Gestor Documental',
+    email: 'gestor@sgde.gov.co',
+    password: 'GESTOR2026!',
+    rol: 'Gestor documental',
+    dependencia: 'Archivo Central',
+    token: 'demo-gestor-session-token',
+  },
+] as const;
+
 export const AUTH_DEMO_CREDENTIALS = {
-  email: 'admin@sgde.gov.co',
-  password: 'SGDE2026!',
+  email: AUTH_DEMO_USERS[0].email,
+  password: AUTH_DEMO_USERS[0].password,
 };
 
 export const APP_ROUTES = {

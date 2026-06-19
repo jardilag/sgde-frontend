@@ -16,5 +16,5 @@ export default async function ProtectedLayout({
     redirect('/login');
   }
 
-  return <AdminShell initialUser={getDemoUser()}>{children}</AdminShell>;
+  return <AdminShell initialUser={getDemoUser(session.value)}>{children}</AdminShell>;
 }

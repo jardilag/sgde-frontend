@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, App, Button, Drawer, Form, Grid, Input, Popconfirm, Select, Space } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
@@ -50,10 +50,10 @@ export function RadicadosModule() {
     setDrawerOpen(true);
   };
 
-  const openEditDrawer = (item: Radicado) => {
+  const openEditDrawer = useCallback((item: Radicado) => {
     setEditingItem(item);
     setDrawerOpen(true);
-  };
+  }, []);
 
   const closeDrawer = () => {
     setEditingItem(null);
@@ -80,7 +80,7 @@ export function RadicadosModule() {
     }
   };
 
-  const handleDelete = async (item: Radicado) => {
+  const handleDelete = useCallback(async (item: Radicado) => {
     try {
       await deleteMutation.mutateAsync(item.id);
       notification.success({ title: 'Radicado eliminado', description: 'El registro se retiró del listado.' });
@@ -90,7 +90,7 @@ export function RadicadosModule() {
         description: error instanceof Error ? error.message : 'No fue posible eliminar el radicado.',
       });
     }
-  };
+  }, [deleteMutation, notification]);
 
   const columns: ColumnsType<Radicado> = useMemo(
     () => [
@@ -108,7 +108,12 @@ export function RadicadosModule() {
         width: compactActions ? 110 : 180,
         render: (_value, record) => (
           <Space size={8}>
-            <Button size={compactActions ? 'small' : 'middle'} icon={<EditOutlined />} onClick={() => openEditDrawer(record)}>
+            <Button
+              size={compactActions ? 'small' : 'middle'}
+              icon={<EditOutlined />}
+              onClick={() => openEditDrawer(record)}
+              aria-label="Editar"
+            >
               {compactActions ? null : 'Editar'}
             </Button>
             <Popconfirm
@@ -118,7 +123,13 @@ export function RadicadosModule() {
               cancelText="Cancelar"
               onConfirm={() => handleDelete(record)}
             >
-              <Button danger size={compactActions ? 'small' : 'middle'} icon={<DeleteOutlined />} loading={deleteMutation.isPending}>
+              <Button
+                danger
+                size={compactActions ? 'small' : 'middle'}
+                icon={<DeleteOutlined />}
+                loading={deleteMutation.isPending}
+                aria-label="Eliminar"
+              >
                 {compactActions ? null : 'Eliminar'}
               </Button>
             </Popconfirm>
@@ -126,7 +137,7 @@ export function RadicadosModule() {
         ),
       },
     ],
-    [compactActions, deleteMutation.isPending],
+    [compactActions, deleteMutation.isPending, handleDelete, openEditDrawer],
   );
 
   return (
@@ -165,14 +176,14 @@ export function RadicadosModule() {
           pageSizeOptions: ['5', '10', '20', '50'],
           responsive: true,
           showLessItems: true,
-          position: ['bottomCenter'],
+          placement: ['bottomCenter'],
         }}
         onTableChange={table.handleTableChange}
         scrollX={1180}
         tableSize="middle"
       />
 
-      <Drawer open={drawerOpen} onClose={closeDrawer} title={editingItem ? 'Editar radicado' : 'Nuevo radicado'} width={720} destroyOnClose>
+      <Drawer open={drawerOpen} onClose={closeDrawer} title={editingItem ? 'Editar radicado' : 'Nuevo radicado'} size="large" destroyOnClose>
         <Form<RadicadoRequest> form={form} layout="vertical" requiredMark={false} onFinish={handleSubmit} initialValues={initialValues}>
           <Form.Item label="Número de radicado" name="numeroRadicado" rules={[{ required: true, message: 'El número de radicado es obligatorio.' }]}>
             <Input placeholder="RAD-2026-0006" />

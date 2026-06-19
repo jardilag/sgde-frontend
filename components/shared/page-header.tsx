@@ -23,8 +23,8 @@ export function PageHeader({
     <div className="sgde-hero-surface sgde-panel" style={{ borderRadius: 24 }}>
       <Space orientation="vertical" size={10} style={{ width: '100%' }}>
         {eyebrow ? <span className="sgde-chip">{eyebrow}</span> : null}
-        <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }} wrap>
-          <div>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <div style={{ minWidth: 0, flex: '1 1 320px' }}>
             <Typography.Title level={2} className="sgde-panel-title">
               {title}
             </Typography.Title>
@@ -32,7 +32,7 @@ export function PageHeader({
               {description}
             </Typography.Paragraph>
           </div>
-          <Space>
+          <Space wrap style={{ flex: '0 1 auto', maxWidth: '100%' }}>
             {extra}
             {actionLabel && onAction ? (
               <Button type="primary" onClick={onAction}>
@@ -40,7 +40,7 @@ export function PageHeader({
               </Button>
             ) : null}
           </Space>
-        </Space>
+        </div>
       </Space>
     </div>
   );

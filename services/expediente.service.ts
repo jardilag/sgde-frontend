@@ -7,6 +7,8 @@ import type { ApiListResponse } from '@/types/common';
 import type {
   DocumentoExpediente,
   Expediente,
+  CarpetaExpediente,
+  CarpetaExpedienteRequest,
   ExpedienteExtended,
   ExpedienteFilters,
   ExpedienteRequest,
@@ -47,6 +49,16 @@ export const expedienteService = {
 
   async deleteExpediente(id: string): Promise<void> {
     await http.delete(`/expedientes/${id}`);
+  },
+
+  async fetchCarpetas(expedienteId: string): Promise<CarpetaExpediente[]> {
+    const { data } = await http.get<{ items: CarpetaExpediente[] }>(`/expedientes/${expedienteId}/carpetas`);
+    return data.items;
+  },
+
+  async createCarpeta(expedienteId: string, payload: CarpetaExpedienteRequest): Promise<CarpetaExpediente> {
+    const { data } = await http.post<{ message: string; item: CarpetaExpediente }>(`/expedientes/${expedienteId}/carpetas`, payload);
+    return data.item;
   },
 
   async cerrarExpediente(id: string, fechaCierre: string): Promise<Expediente> {

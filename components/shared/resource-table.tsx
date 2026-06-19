@@ -44,21 +44,24 @@ export function ResourceTable<T>({
   scrollX = 960,
   tableSize = 'middle',
 }: ResourceTableProps<T>) {
+  const paginationConfig = { ...pagination };
+  delete paginationConfig.position;
+
   return (
-    <Card className="sgde-card-elevated" styles={{ body: { display: 'grid', gap: 18 } }}>
+    <Card className="sgde-card-elevated" style={{ maxWidth: '100%', overflow: 'hidden' }} styles={{ body: { display: 'grid', gap: 18, minWidth: 0 } }}>
       <Space orientation="vertical" size={8} style={{ width: '100%' }}>
         <span className="sgde-chip">{eyebrow}</span>
-        <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }} wrap>
-          <div>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+          <div style={{ minWidth: 0, flex: '1 1 280px' }}>
             <Typography.Title level={4} style={{ marginBottom: 4 }}>
               {title}
             </Typography.Title>
             <Typography.Text className="sgde-muted">{description}</Typography.Text>
           </div>
-          <Button type="primary" onClick={onCreate}>
+          <Button type="primary" onClick={onCreate} style={{ flex: '0 0 auto' }}>
             {createLabel}
           </Button>
-        </Space>
+        </div>
         <Input.Search
           allowClear
           placeholder={searchPlaceholder}
@@ -67,24 +70,25 @@ export function ResourceTable<T>({
           style={{ maxWidth: 420 }}
         />
       </Space>
-      <Table<T>
-        rowKey={rowKey}
-        loading={loading}
-        dataSource={dataSource}
-        columns={columns}
-        rowClassName={rowClassName}
-        pagination={{
-          ...pagination,
-          responsive: true,
-          showLessItems: true,
-          position: ['bottomCenter'],
-          size: 'default',
-          pageSizeOptions: pagination.pageSizeOptions ?? ['5', '10', '20', '50'],
-        }}
-        onChange={onTableChange}
-        size={tableSize}
-        scroll={{ x: scrollX }}
-      />
+      <div style={{ maxWidth: '100%', minWidth: 0, overflowX: 'auto' }}>
+        <Table<T>
+          rowKey={rowKey}
+          loading={loading}
+          dataSource={dataSource}
+          columns={columns}
+          rowClassName={rowClassName}
+          pagination={{
+            ...paginationConfig,
+            responsive: true,
+            showLessItems: true,
+            placement: ['bottomCenter'],
+            pageSizeOptions: pagination.pageSizeOptions ?? ['5', '10', '20', '50'],
+          }}
+          onChange={onTableChange}
+          size={tableSize}
+          scroll={{ x: scrollX }}
+        />
+      </div>
     </Card>
   );
 }

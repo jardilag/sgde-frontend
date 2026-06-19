@@ -17,6 +17,7 @@ export function buildDocumentoFormData(payload: DocumentoRequest) {
   formData.append('fechaDocumento', payload.fechaDocumento);
   formData.append('dependenciaId', payload.dependenciaId);
   appendIfPresent(formData, 'expedienteId', payload.expedienteId);
+  appendIfPresent(formData, 'carpetaId', payload.carpetaId);
   appendIfPresent(formData, 'observacion', payload.observacion);
   formData.append('archivo', payload.archivo);
 

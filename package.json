@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint app components hooks services types utils --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
     "test:unit": "jest --runInBand",
     "test:e2e": "playwright test",

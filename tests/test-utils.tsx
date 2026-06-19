@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 if (typeof window !== 'undefined') {
   window.getComputedStyle = (() => ({
     getPropertyValue: () => '',
-  })) as typeof window.getComputedStyle;
+  })) as unknown as typeof window.getComputedStyle;
 }
 
 export function renderWithProviders(ui: React.ReactElement) {

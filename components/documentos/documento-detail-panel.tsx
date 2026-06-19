@@ -54,6 +54,7 @@ export function DocumentoDetailPanel({ documento, open, onClose }: DocumentoDeta
             <Tag color="geekblue">{documento.tipoDocumento}</Tag>
             <Tag color="cyan">{documento.dependenciaNombre ?? documento.dependencia ?? 'Sin dependencia'}</Tag>
             {documento.expedienteCodigo ? <Tag color="green">{documento.expedienteCodigo}</Tag> : null}
+            {documento.carpetaNombre ? <Tag color="purple">{documento.carpetaNombre}</Tag> : null}
           </div>
 
           <Descriptions bordered size="small" column={1}>
@@ -61,6 +62,7 @@ export function DocumentoDetailPanel({ documento, open, onClose }: DocumentoDeta
             <Descriptions.Item label="Fecha del documento">{formatDate(documento.fechaDocumento ?? documento.fechaRadicacion)}</Descriptions.Item>
             <Descriptions.Item label="Dependencia">{documento.dependenciaNombre ?? documento.dependencia ?? 'Sin dato'}</Descriptions.Item>
             <Descriptions.Item label="Expediente">{documento.expedienteCodigo ?? documento.expedienteId ?? 'No asociado'}</Descriptions.Item>
+            <Descriptions.Item label="Carpeta">{documento.carpetaNombre ?? 'Sin carpeta'}</Descriptions.Item>
             <Descriptions.Item label="Archivo">{documento.archivoNombre ?? documento.metadata?.nombreArchivo ?? 'Sin archivo'}</Descriptions.Item>
             <Descriptions.Item label="Tipo MIME">{documento.mimeType ?? documento.metadata?.mimeType ?? 'Sin dato'}</Descriptions.Item>
             <Descriptions.Item label="Tamaño">{formatFileSize(documento.tamanioBytes ?? documento.metadata?.tamanioBytes)}</Descriptions.Item>
