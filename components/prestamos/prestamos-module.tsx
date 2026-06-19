@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Button, Popconfirm, notification } from 'antd';
+import { App, Button, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
@@ -33,6 +33,7 @@ function buildFilters(
 }
 
 export function PrestamosModule() {
+  const { notification } = App.useApp();
   const table = useTableControls<Prestamo>();
   const [formOpen, setFormOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<PrestamoAdvancedFilters>(initialAdvancedFilters);
@@ -57,12 +58,12 @@ export function PrestamosModule() {
     try {
       await createMutation.mutateAsync(payload);
       notification.success({
-        message: 'Préstamo registrado',
+        title: 'Préstamo registrado',
         description: 'El préstamo quedó en seguimiento con estado actualizado.',
       });
     } catch (error) {
       notification.error({
-        message: 'Error al registrar préstamo',
+        title: 'Error al registrar préstamo',
         description: error instanceof Error ? error.message : 'No fue posible registrar el préstamo.',
       });
       throw error;
@@ -81,12 +82,12 @@ export function PrestamosModule() {
       });
 
       notification.success({
-        message: 'Devolución registrada',
+        title: 'Devolución registrada',
         description: `El expediente ${prestamo.expedienteCodigo ?? ''} se marcó como devuelto.`,
       });
     } catch (error) {
       notification.error({
-        message: 'Error al registrar devolución',
+        title: 'Error al registrar devolución',
         description: error instanceof Error ? error.message : 'No fue posible registrar la devolución.',
       });
     }

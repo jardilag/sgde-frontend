@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Alert, Button, Card, Drawer, Form, Input, InputNumber, Popconfirm, Select, Space, Table, Tabs, Typography, notification } from 'antd';
+import { Alert, App, Button, Card, Drawer, Form, Input, InputNumber, Popconfirm, Select, Space, Table, Tabs, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
@@ -31,6 +31,7 @@ const subserieInitialValues: SubserieRequest = {
 };
 
 export function TrdModule() {
+  const { notification } = App.useApp();
   const serieTable = useTableControls<Serie>();
   const seriesQuery = useSeriesQuery({ q: serieTable.query, page: serieTable.page, pageSize: serieTable.pageSize });
   const { createMutation: createSerieMutation, updateMutation: updateSerieMutation, deleteMutation: deleteSerieMutation } = useSeriesMutations();
@@ -79,15 +80,15 @@ export function TrdModule() {
     try {
       if (editingSerie) {
         await updateSerieMutation.mutateAsync({ id: editingSerie.id, payload: values });
-        notification.success({ message: 'Serie actualizada', description: 'Los cambios se guardaron correctamente.' });
+        notification.success({ title: 'Serie actualizada', description: 'Los cambios se guardaron correctamente.' });
       } else {
         await createSerieMutation.mutateAsync(values);
-        notification.success({ message: 'Serie creada', description: 'La serie se agregó al TRD.' });
+        notification.success({ title: 'Serie creada', description: 'La serie se agregó al TRD.' });
       }
       closeSerieDrawer();
     } catch (error) {
       notification.error({
-        message: editingSerie ? 'Error al actualizar' : 'Error al crear',
+        title: editingSerie ? 'Error al actualizar' : 'Error al crear',
         description: error instanceof Error ? error.message : 'No fue posible completar la operación.',
       });
     }
@@ -96,13 +97,13 @@ export function TrdModule() {
   const handleDeleteSerie = async (serie: Serie) => {
     try {
       await deleteSerieMutation.mutateAsync(serie.id);
-      notification.success({ message: 'Serie eliminada', description: 'El registro se retiró del TRD.' });
+      notification.success({ title: 'Serie eliminada', description: 'El registro se retiró del TRD.' });
       if (selectedSerie?.id === serie.id) {
         setSelectedSerie(null);
       }
     } catch (error) {
       notification.error({
-        message: 'Error al eliminar',
+        title: 'Error al eliminar',
         description: error instanceof Error ? error.message : 'No fue posible eliminar la serie.',
       });
     }
@@ -112,7 +113,7 @@ export function TrdModule() {
 
   const openCreateSubserieDrawer = () => {
     if (!selectedSerie) {
-      notification.warning({ message: 'Selecciona una serie', description: 'Debes seleccionar una serie primero.' });
+      notification.warning({ title: 'Selecciona una serie', description: 'Debes seleccionar una serie primero.' });
       return;
     }
     setEditingSubserie(null);
@@ -137,15 +138,15 @@ export function TrdModule() {
     try {
       if (editingSubserie) {
         await updateSubserieMutation.mutateAsync({ id: editingSubserie.id, payload: values });
-        notification.success({ message: 'Subserie actualizada', description: 'Los cambios se guardaron correctamente.' });
+        notification.success({ title: 'Subserie actualizada', description: 'Los cambios se guardaron correctamente.' });
       } else {
         await createSubserieMutation.mutateAsync(values);
-        notification.success({ message: 'Subserie creada', description: 'La subserie se agregó a la serie.' });
+        notification.success({ title: 'Subserie creada', description: 'La subserie se agregó a la serie.' });
       }
       closeSubserieDrawer();
     } catch (error) {
       notification.error({
-        message: editingSubserie ? 'Error al actualizar' : 'Error al crear',
+        title: editingSubserie ? 'Error al actualizar' : 'Error al crear',
         description: error instanceof Error ? error.message : 'No fue posible completar la operación.',
       });
     }
@@ -154,10 +155,10 @@ export function TrdModule() {
   const handleDeleteSubserie = async (subserie: Subserie) => {
     try {
       await deleteSubserieMutation.mutateAsync(subserie.id);
-      notification.success({ message: 'Subserie eliminada', description: 'El registro se retiró de la serie.' });
+      notification.success({ title: 'Subserie eliminada', description: 'El registro se retiró de la serie.' });
     } catch (error) {
       notification.error({
-        message: 'Error al eliminar',
+        title: 'Error al eliminar',
         description: error instanceof Error ? error.message : 'No fue posible eliminar la subserie.',
       });
     }
@@ -259,7 +260,7 @@ export function TrdModule() {
       />
 
       {seriesQuery.isError ? (
-        <Alert type="error" showIcon message="No fue posible cargar las series" description={(seriesQuery.error as Error).message} />
+        <Alert type="error" showIcon title="No fue posible cargar las series" description={(seriesQuery.error as Error).message} />
       ) : null}
 
       <Tabs

@@ -25,7 +25,7 @@ export function ActividadRecienteTable({ data }: Readonly<ActividadRecienteTable
   ];
 
   return (
-    <Card className="sgde-surface" title="Actividad reciente del sistema">
+    <Card className="sgde-card-elevated sgde-card-hover" title="Actividad reciente del sistema">
       <Table<DashboardActividadReciente>
         rowKey="id"
         dataSource={data}
@@ -33,6 +33,7 @@ export function ActividadRecienteTable({ data }: Readonly<ActividadRecienteTable
         pagination={false}
         locale={{ emptyText: <Empty description="Sin actividad reciente" /> }}
         scroll={{ x: 900 }}
+        size="middle"
       />
     </Card>
   );

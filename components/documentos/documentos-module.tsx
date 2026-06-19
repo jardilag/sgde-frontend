@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Button, notification, Tag } from 'antd';
+import { App, Button, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { EyeOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
@@ -35,6 +35,7 @@ function mergeFilters(table: ReturnType<typeof useTableControls<Documento>>, adv
 }
 
 export function DocumentosModule() {
+  const { notification } = App.useApp();
   const table = useTableControls<Documento>();
   const [advancedFilters, setAdvancedFilters] = useState<DocumentoAdvancedFilters>(initialAdvancedFilters);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -83,14 +84,14 @@ export function DocumentosModule() {
     try {
       const documento = await createMutation.mutateAsync({ payload, onProgress });
       notification.success({
-        message: 'Documento radicado',
+        title: 'Documento radicado',
         description: `El backend generó el radicado ${documento.numeroRadicado ?? documento.radicado}.`,
       });
       setSelectedDocumento(documento);
       setDetailOpen(true);
     } catch (error) {
       notification.error({
-        message: 'Error al radicar',
+        title: 'Error al radicar',
         description: error instanceof Error ? error.message : 'No fue posible completar la radicación.',
       });
       throw error;
@@ -100,13 +101,13 @@ export function DocumentosModule() {
   const handleQuickConsult = () => {
     const value = consultRadicado.trim();
     if (!value) {
-      notification.warning({ message: 'Ingresa un número de radicado para consultar.' });
+      notification.warning({ title: 'Ingresa un número de radicado para consultar.' });
       return;
     }
 
     if (documentoConsultaQuery.data === null) {
       notification.warning({
-        message: 'Radicado no encontrado',
+        title: 'Radicado no encontrado',
         description: `No se encontró un documento con el número ${value}.`,
       });
     }

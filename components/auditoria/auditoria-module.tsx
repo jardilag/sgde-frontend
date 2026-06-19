@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Button, notification } from 'antd';
+import { App, Button } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { PageHeader } from '@/components/shared/page-header';
@@ -37,6 +37,7 @@ function formatDateTime(value: string) {
 }
 
 export function AuditoriaModule() {
+  const { notification } = App.useApp();
   const table = useTableControls<AuditoriaRegistro>();
   const [advancedFilters, setAdvancedFilters] = useState<AuditoriaAdvancedFilters>(initialAdvancedFilters);
 

@@ -14,15 +14,15 @@ const links = [
 
 export function ModulosPrincipalesCard() {
   return (
-    <Card className="sgde-surface" title="Navegación rápida">
-      <Space wrap size={[8, 8]}>
+    <Card className="sgde-card-elevated sgde-card-hover" title="Navegación rápida" styles={{ body: { paddingTop: 20 } }}>
+      <Space wrap size={[10, 10]}>
         {links.map((item) => (
           <Link key={item.href} href={item.href}>
-            <span className="sgde-chip">{item.label}</span>
+            <span className="sgde-chip" style={{ padding: '10px 14px' }}>{item.label}</span>
           </Link>
         ))}
       </Space>
-      <Typography.Paragraph className="sgde-muted" style={{ marginTop: 12, marginBottom: 0 }}>
+      <Typography.Paragraph className="sgde-muted" style={{ marginTop: 14, marginBottom: 0 }}>
         Accede a los módulos principales desde el tablero para seguimiento operativo.
       </Typography.Paragraph>
     </Card>

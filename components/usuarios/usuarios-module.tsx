@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Alert, Button, Drawer, Form, Input, Popconfirm, Select, Space, Switch, notification } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { Alert, App, Button, Drawer, Form, Input, Popconfirm, Select, Space, Switch } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { PageHeader } from '@/components/shared/page-header';
 import { ResourceTable } from '@/components/shared/resource-table';
 import { StatusTag } from '@/components/shared/status-tag';
+import { useDependenciasQuery } from '@/hooks/use-dependencias';
 import { useTableControls } from '@/hooks/use-table-controls';
 import { useUsuarioMutations, useUsuariosQuery } from '@/hooks/use-usuarios';
 import type { Usuario, UsuarioRequest } from '@/types/usuario';
@@ -26,12 +27,25 @@ const initialValues: UsuarioRequest = {
 };
 
 export function UsuariosModule() {
+  const { notification } = App.useApp();
   const table = useTableControls<Usuario>();
   const usuariosQuery = useUsuariosQuery({ q: table.query, page: table.page, pageSize: table.pageSize });
+  const dependenciasQuery = useDependenciasQuery({ q: '', page: 1, pageSize: 200 });
   const { createMutation, updateMutation, deleteMutation } = useUsuarioMutations();
   const [form] = Form.useForm<UsuarioRequest>();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Usuario | null>(null);
+
+  const dependenciasActivasOptions = useMemo(
+    () =>
+      dependenciasQuery.data?.items
+        .filter((dependencia) => dependencia.estado === 'Activa')
+        .map((dependencia) => ({
+          label: `${dependencia.nombre} (${dependencia.codigo})`,
+          value: dependencia.nombre,
+        })) ?? [],
+    [dependenciasQuery.data?.items],
+  );
 
   useEffect(() => {
     if (drawerOpen) {
@@ -59,16 +73,16 @@ export function UsuariosModule() {
     try {
       if (editingItem) {
         await updateMutation.mutateAsync({ id: editingItem.id, payload: values });
-        notification.success({ message: 'Usuario actualizado', description: 'La información quedó guardada correctamente.' });
+        notification.success({ title: 'Usuario actualizado', description: 'La información quedó guardada correctamente.' });
       } else {
         await createMutation.mutateAsync(values);
-        notification.success({ message: 'Usuario creado', description: 'El usuario quedó disponible en la plataforma.' });
+        notification.success({ title: 'Usuario creado', description: 'El usuario quedó disponible en la plataforma.' });
       }
 
       closeDrawer();
     } catch (error) {
       notification.error({
-        message: editingItem ? 'Error al actualizar' : 'Error al crear',
+        title: editingItem ? 'Error al actualizar' : 'Error al crear',
         description: error instanceof Error ? error.message : 'No fue posible completar la operación.',
       });
     }
@@ -77,10 +91,10 @@ export function UsuariosModule() {
   const handleDelete = async (item: Usuario) => {
     try {
       await deleteMutation.mutateAsync(item.id);
-      notification.success({ message: 'Usuario eliminado', description: 'El registro se retiró del listado.' });
+      notification.success({ title: 'Usuario eliminado', description: 'El registro se retiró del listado.' });
     } catch (error) {
       notification.error({
-        message: 'Error al eliminar',
+        title: 'Error al eliminar',
         description: error instanceof Error ? error.message : 'No fue posible eliminar el usuario.',
       });
     }
@@ -129,7 +143,7 @@ export function UsuariosModule() {
       />
 
       {usuariosQuery.isError ? (
-        <Alert type="error" showIcon message="No fue posible cargar los usuarios" description={(usuariosQuery.error as Error).message} />
+        <Alert type="error" showIcon title="No fue posible cargar los usuarios" description={(usuariosQuery.error as Error).message} />
       ) : null}
 
       <ResourceTable<Usuario>
@@ -167,7 +181,18 @@ export function UsuariosModule() {
             <Select options={roles} />
           </Form.Item>
           <Form.Item label="Dependencia" name="dependencia" rules={[{ required: true, message: 'La dependencia es obligatoria.' }]}>
-            <Input placeholder="Dependencia asignada" />
+            <Select
+              showSearch
+              allowClear
+              placeholder="Seleccione una dependencia activa"
+              options={dependenciasActivasOptions}
+              loading={dependenciasQuery.isLoading}
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+              }
+              notFoundContent={dependenciasQuery.isLoading ? 'Cargando dependencias...' : 'No hay dependencias activas'}
+            />
           </Form.Item>
           <Form.Item label="Activo" name="activo" valuePropName="checked" rules={[{ required: true, message: 'El estado es obligatorio.' }]}>
             <Switch checkedChildren="Sí" unCheckedChildren="No" />
